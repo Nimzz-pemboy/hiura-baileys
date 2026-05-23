@@ -67,7 +67,7 @@
         "chalk": "^4.1.2",
         "futoin-hkdf": "^1.5.1",
         "libphonenumber-js": "^1.10.20",
-        "libsignal": "npm:@hiura/libsignal",
+        "libsignal": "npm:hiura-libsignal@^1.0.0",
         "lodash": "^4.17.21",
         "music-metadata": "^7.12.3",
         "node-cache": "^5.1.2",
@@ -84,10 +84,18 @@
         "sharp": "^0.32.2"
     },
     "peerDependenciesMeta": {
-        "jimp": { "optional": true },
-        "link-preview-js": { "optional": true },
-        "qrcode-terminal": { "optional": true },
-        "sharp": { "optional": true }
+        "jimp": {
+            "optional": true
+        },
+        "link-preview-js": {
+            "optional": true
+        },
+        "qrcode-terminal": {
+            "optional": true
+        },
+        "sharp": {
+            "optional": true
+        }
     },
     "engines": {
         "node": ">=20.0.0"
