@@ -1,12 +1,26 @@
 {
     "name": "hiura-baileys",
     "type": "module",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "WhatsApp Web API — Hiura Baileys by Nimzz. Full LID+JID, all buttons, dual CJS/ESM.",
-    "keywords": ["whatsapp", "hiura", "hiura-baileys", "nimzz", "baileys", "bot", "lid", "button"],
+    "keywords": [
+        "whatsapp",
+        "hiura",
+        "hiura-baileys",
+        "nimzz",
+        "baileys",
+        "bot",
+        "lid",
+        "button"
+    ],
     "homepage": "https://github.com/Nimzz-pemboy/hiura-baileys",
-    "repository": { "type": "git", "url": "https://github.com/Nimzz-pemboy/hiura-baileys.git" },
-    "bugs": { "url": "https://github.com/Nimzz-pemboy/hiura-baileys/issues" },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Nimzz-pemboy/hiura-baileys.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Nimzz-pemboy/hiura-baileys/issues"
+    },
     "license": "MIT",
     "author": "Nimzz <https://github.com/Nimzz-pemboy>",
     "main": "./index.cjs",
@@ -14,8 +28,14 @@
     "types": "./index.d.ts",
     "exports": {
         ".": {
-            "import": { "types": "./lib/index.d.ts", "default": "./lib/index.js" },
-            "require": { "types": "./index.d.ts", "default": "./index.cjs" },
+            "import": {
+                "types": "./lib/index.d.ts",
+                "default": "./lib/index.js"
+            },
+            "require": {
+                "types": "./index.d.ts",
+                "default": "./index.cjs"
+            },
             "default": "./lib/index.js"
         },
         "./MessageBuilder": {
@@ -59,9 +79,15 @@
         "sharp": "*"
     },
     "peerDependenciesMeta": {
-        "jimp": { "optional": true },
-        "link-preview-js": { "optional": true }
+        "jimp": {
+            "optional": true
+        },
+        "link-preview-js": {
+            "optional": true
+        }
     },
     "packageManager": "yarn@4.9.2",
-    "engines": { "node": ">=20.0.0" }
+    "engines": {
+        "node": ">=20.0.0"
+    }
 }
