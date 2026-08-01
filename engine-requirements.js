@@ -1,15 +1,12 @@
-const [major, minor] = process.versions.node.split('.').map(Number);
-
-// require(esm) sinkron stabil tanpa flag sejak Node v20.19.0 dan v22.12.0
-// (lihat index.cjs). Versi 20.x di bawah 20.19, atau 21.x, TIDAK didukung.
-const ok = (major === 20 && minor >= 19) || (major === 22 && minor >= 12) || major > 22;
-
-if (!ok) {
-  console.error(
-    `\n❌ This package requires Node.js >=20.19.0 or >=22.12.0 to run reliably ` +
-    `(needs native synchronous require(esm) support).\n` +
-    `   You are using Node.js ${process.versions.node}.\n` +
-    `   Please upgrade your Node.js version to proceed.\n`
-  );
-  process.exit(1);
-}
+/**
+ * hiura-baileys — engine requirements check (no-op)
+ *
+ * This used to hard-exit the process unless Node.js was >=20.19.0 or
+ * >=22.12.0, because index.cjs relied on synchronous require(esm), which
+ * only works on those exact patch floors. index.cjs no longer does that
+ * (it's a plain ESM-only notice now — see index.cjs), so there is nothing
+ * version-specific left to enforce here.
+ *
+ * Kept as a no-op, rather than deleted, in case anything in an existing
+ * deployment still points at this file by path.
+ */

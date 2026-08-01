@@ -52,6 +52,10 @@ export type SignalRepository = {
         senderKeyDistributionMessage: Uint8Array;
         ciphertext: Uint8Array;
     }>;
+    getSessionInfo(jid: string): Promise<{
+        baseKey: Uint8Array;
+        registrationId: number;
+    } | null>;
     injectE2ESession(opts: E2ESessionOpts): Promise<void>;
     validateSession(jid: string): Promise<{
         exists: boolean;

@@ -1,52 +1,134 @@
-# hiura-baileys
+<h1 align="center">hiura-baileys</h1>
 
-WhatsApp Web API for Node.js. Fork dari [@blckrose/baileys](https://www.npmjs.com/package/@blckrose/baileys) dengan penambahan fitur LID penuh, semua tipe button dan interactive message, rich messages, decrypt handler, VoIP (panggilan suara), dan perbaikan CJS compatibility.
+<p align="center">
+  <img src="REPLACE_WITH_YOUR_BANNER_IMAGE_URL" alt="hiura-baileys" width="100%" />
+</p>
 
-[![npm](https://img.shields.io/npm/v/hiura-baileys?style=flat-square)](https://npmjs.com/package/hiura-baileys)
-[![node](https://img.shields.io/badge/node-%3E%3D20.19-brightgreen?style=flat-square)](https://nodejs.org)
-[![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+<p align="center">
+  WhatsApp Web API for Node.js. A fork of <a href="https://www.npmjs.com/package/@blckrose/baileys">@blckrose/baileys</a> with full LID support, every button and interactive message type, rich messages, decrypt handlers, VoIP (voice calls), and CJS compatibility fixes.
+</p>
+
+<p align="center">
+  <a href="https://npmjs.com/package/hiura-baileys"><img src="https://img.shields.io/npm/v/hiura-baileys?style=flat-square" alt="npm"></a>
+  <a href="https://npmjs.com/package/hiura-baileys"><img src="https://img.shields.io/npm/dm/hiura-baileys?style=flat-square" alt="downloads"></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen?style=flat-square" alt="node"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license"></a>
+</p>
+
+---
+
+## ✨ Features
+
+- 🔐 Full **LID** (Linked ID) support alongside standard JID
+- 🔘 Every WhatsApp button & interactive message type — native flow, templates, carousels, product cards, and more
+- 📊 **Rich messages**: tables, code blocks, LaTeX, link previews
+- 📞 Built-in **VoIP** module for programmatic voice calls
+- 🔓 Automatic **decrypt handlers** for polls, events, comments, and reactions
+- 🌟 es module only
+---
+
+<details>
+<summary><strong>📑 Table of Contents</strong></summary>
+
+**Getting Started**
+- [Requirements](#requirements)
+- [How to Import](#how-to-import)
+- [Quick Start](#quick-start)
+
+**Sending Messages**
+- [Text Messages](#text-messages)
+- [Media Messages](#media-messages)
+- [Album (Multi-Media)](#album-multi-media)
+- [Sticker Pack](#sticker-pack)
+- [Reaction, Delete, Pin, Keep](#reaction-delete-pin-keep)
+- [Poll & Event](#poll--event)
+- [Payment & Order](#payment--order)
+- [Scheduled Call](#scheduled-call)
+
+**Voice & Calls**
+- [VoIP (Voice Calls)](#voip-voice-calls)
+
+**Interactive & Rich Content**
+- [List Reply & Button Reply](#list-reply--button-reply)
+- [Sections (List Message)](#sections-list-message)
+- [Product List](#product-list)
+- [Buttons (Plain)](#buttons-plain)
+- [Template Buttons](#template-buttons)
+- [Interactive Buttons (Native Flow)](#interactive-buttons-native-flow)
+- [Shop, Collection, Cards](#shop-collection-cards)
+- [Carousel (Raw)](#carousel-raw)
+- [Interactive Messages (Hiura Engine)](#interactive-messages-hiura-engine)
+- [Rich Messages (Hiura Engine)](#rich-messages-hiura-engine)
+
+**Groups & Newsletters**
+- [Group Invite & Newsletter Admin Invite](#group-invite--newsletter-admin-invite)
+- [Share Phone & Limit Sharing](#share-phone--limit-sharing)
+- [Group Story / Group Status](#group-story--group-status)
+- [Status / WA Story](#status--wa-story)
+- [Ephemeral / Disappearing Messages](#ephemeral--disappearing-messages)
+- [Group Management](#group-management)
+- [Newsletter (Channels)](#newsletter-channels)
+
+**Utilities & Internals**
+- [JID Utilities](#jid-utilities)
+- [Decrypt Handler](#decrypt-handler)
+- [In-Memory Store](#in-memory-store)
+- [Auth State](#auth-state)
+- [Handling Incoming Messages](#handling-incoming-messages)
+- [Typography & contextInfo](#typography--contextinfo)
+- [DisconnectReason](#disconnectreason)
+- [Browsers](#browsers)
+
+**Reference**
+- [FAQ](#faq)
+- [Changelog](#changelog)
+- [License](#license)
+
+</details>
 
 ---
 
 ## Credits
 
-| Project | Kontribusi |
+| Project | Contribution |
 |---------|-----------|
-| [@blckrose/baileys](https://www.npmjs.com/package/@blckrose/baileys) | Base utama library ini |
-| [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys) | Baileys core original |
+| [@blckrose/baileys](https://www.npmjs.com/package/@blckrose/baileys) | Main base of this library |
+| [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys) | Original Baileys core |
 
 ---
 
-## Persyaratan
+## Requirements
 
-- Node.js >= 20.19.0 atau >= 22.12.0 (lihat penjelasan di bawah)
-- npm atau yarn
+- Node.js >= 20.0.0
+- npm or yarn
 
 ```bash
 npm install hiura-baileys
 ```
 
-> **Kenapa versi Node sespesifik ini?** Sejak v1.5.1, CJS entry point
-> (`index.cjs`) memakai `require(esm)` native Node untuk meng-load
-> `lib/index.js` (ESM) secara sinkron — fitur ini baru stabil tanpa
-> flag sejak Node v20.19.0 dan v22.12.0. Kalau Node Anda lebih lama
-> dari itu (termasuk semua versi 21.x), `require('hiura-baileys')`
-> akan langsung gagal dengan pesan error yang menjelaskan versi
-> minimum yang dibutuhkan. Cek versi Node Anda: `node -v`.
+> **Why does `require()` now throw in CJS?** As of v1.5.3, the CJS entry
+> point (`index.cjs`) is a static, version-independent shim: calling
+> `require('hiura-baileys')` throws immediately with a message pointing you
+> to `import` (ESM) or `await import('hiura-baileys')` from CJS. Earlier
+> versions (v1.5.1–v1.5.2) tried to bridge synchronously into the ESM build
+> using Node's native `require(esm)`, which only worked on Node >=20.19.0 or
+> >=22.12.0 — that patch-version gate is gone now, which is also why the
+> Node.js requirement dropped back down to `>=20.0.0`. See the
+> [FAQ](#faq) for details.
 
-Untuk fitur media (thumbnail, image processing):
+For media features (thumbnails, image processing):
 ```bash
 npm install sharp
 ```
 
-Untuk logging:
+For logging:
 ```bash
 npm install pino
 ```
 
 ---
 
-## Cara Import
+## How to Import
 
 ### ESM
 ```js
@@ -61,8 +143,10 @@ import makeWASocket, {
 } from 'hiura-baileys';
 ```
 
-### CJS
+### CJS (dynamic import)
 ```js
+// require('hiura-baileys') throws by design as of v1.5.3 — see FAQ.
+// Use a dynamic import instead, inside an async function:
 const {
     makeWASocket,
     useMultiFileAuthState,
@@ -72,14 +156,14 @@ const {
     makeInMemoryStore,
     fetchLatestBaileysVersion,
     proto
-} = require('hiura-baileys');
+} = await import('hiura-baileys');
 ```
 
-Semua 317 export tersedia langsung di CJS maupun ESM, secara sinkron —
-tidak perlu `await ready`, tidak perlu `await useMultiFileAuthState()`
-duluan, tidak ada lagi konsep "belum siap". `require('hiura-baileys')`
-langsung mengembalikan semua export seketika, persis seperti module CJS
-biasa (sejak v1.5.1, lihat [Changelog](#changelog)).
+All 317 exports are available directly from the ESM build, and from the
+CJS side via `await import('hiura-baileys')` — no `await ready`, no
+loading a function first just to "unlock" the rest. Direct synchronous
+`require()` is intentionally unsupported since v1.5.3 (see
+[Changelog](#changelog)).
 
 ---
 
@@ -125,7 +209,7 @@ async function start() {
         if (connection === 'close') {
             const code = new Boom(lastDisconnect?.error)?.output?.statusCode;
             if (code !== DisconnectReason.loggedOut) start();
-            else console.log('Logged out. Hapus folder sessions lalu restart.');
+            else console.log('Logged out. Delete the sessions folder and restart.');
         }
         if (connection === 'open') console.log('Connected!');
     });
@@ -145,7 +229,7 @@ async function start() {
 start();
 ```
 
-### Pairing Code (tanpa QR)
+### Pairing Code (no QR)
 
 ```js
 const sock = makeWASocket({ printQRInTerminal: false, ...config });
@@ -153,30 +237,30 @@ const sock = makeWASocket({ printQRInTerminal: false, ...config });
 sock.ev.on('connection.update', async ({ connection }) => {
     if (connection === 'connecting' && !sock.authState.creds.registered) {
         const code = await sock.requestPairingCode('6281234567890');
-        console.log('Kode:', code?.match(/.{1,4}/g)?.join('-'));
+        console.log('Code:', code?.match(/.{1,4}/g)?.join('-'));
     }
 });
 ```
 
 ---
 
-## Pesan Teks
+## Text Messages
 
 ```js
-// teks biasa
-await sock.sendMessage(jid, { text: 'halo' });
+// plain text
+await sock.sendMessage(jid, { text: 'hello' });
 
-// dengan mention
+// with mention
 await sock.sendMessage(jid, {
-    text: '@628111 halo',
+    text: '@628111 hello',
     mentions: ['628111@s.whatsapp.net']
 });
 
-// dengan quoted
-await sock.sendMessage(jid, { text: 'balas' }, { quoted: m });
+// with quoted reply
+await sock.sendMessage(jid, { text: 'reply' }, { quoted: m });
 
-// edit pesan
-await sock.sendMessage(jid, { text: 'teks baru', edit: m.key });
+// edit message
+await sock.sendMessage(jid, { text: 'new text', edit: m.key });
 
 // forward
 await sock.sendMessage(jid, { forward: m });
@@ -184,17 +268,17 @@ await sock.sendMessage(jid, { forward: m });
 
 ---
 
-## Pesan Media
+## Media Messages
 
 ```js
-// gambar
+// image
 await sock.sendMessage(jid, { image: { url: 'https://...' }, caption: 'caption' });
 await sock.sendMessage(jid, { image: readFileSync('./img.jpg'), caption: 'caption' });
 
 // video
 await sock.sendMessage(jid, { video: { url: 'https://...' }, caption: 'caption' });
 
-// audio biasa
+// regular audio
 await sock.sendMessage(jid, {
     audio: { url: 'https://...' },
     mimetype: 'audio/mp4'
@@ -207,13 +291,13 @@ await sock.sendMessage(jid, {
     ptt: true
 });
 
-// video note (PTV / lingkaran)
+// video note (PTV / circular)
 await sock.sendMessage(jid, {
     video: { url: 'https://...' },
     ptv: true
 });
 
-// dokumen
+// document
 await sock.sendMessage(jid, {
     document: { url: 'https://...' },
     mimetype: 'application/pdf',
@@ -223,15 +307,15 @@ await sock.sendMessage(jid, {
 // sticker
 await sock.sendMessage(jid, { sticker: readFileSync('./sticker.webp') });
 
-// kontak
+// contact
 await sock.sendMessage(jid, {
     contacts: {
-        displayName: 'Nama',
-        contacts: [{ vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN:Nama\nTEL:+62811\nEND:VCARD' }]
+        displayName: 'Name',
+        contacts: [{ vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN:Name\nTEL:+62811\nEND:VCARD' }]
     }
 });
 
-// lokasi
+// location
 await sock.sendMessage(jid, {
     location: {
         degreesLatitude: -6.200000,
@@ -244,47 +328,47 @@ await sock.sendMessage(jid, {
 
 ---
 
-## Album (multi-media)
+## Album (Multi-Media)
 
-Kirim beberapa gambar/video sekaligus dalam satu album:
+Send several images/videos at once in a single album:
 
 ```js
 await sock.sendMessage(jid, {
     album: [
-        { image: { url: 'https://...' }, caption: 'foto 1' },
-        { image: readFileSync('./img.jpg'), caption: 'foto 2' },
+        { image: { url: 'https://...' }, caption: 'photo 1' },
+        { image: readFileSync('./img.jpg'), caption: 'photo 2' },
         { video: { url: 'https://...' }, caption: 'video 1' },
     ]
 }, { quoted: m });
 ```
 
-Maksimal campuran gambar dan video. Caption per item.
+Images and videos can be freely mixed. Each item can have its own caption.
 
 ---
 
 ## Sticker Pack
 
-Kirim pack sticker ke chat:
+Send a sticker pack to a chat:
 
 ```js
-// Butuh: npm install fflate sharp
+// Requires: npm install fflate sharp
 await sock.sendMessage(jid, {
     stickerPack: {
-        name: 'Nama Pack',
+        name: 'Pack Name',
         publisher: 'Publisher',
-        packId: 'pack-id-unik',           // opsional, auto-generate kalau kosong
-        description: 'Deskripsi pack',    // opsional
-        cover: readFileSync('./cover.webp'), // opsional
+        packId: 'unique-pack-id',           // optional, auto-generated if omitted
+        description: 'Pack description',    // optional
+        cover: readFileSync('./cover.webp'), // optional
         stickers: [
             { data: readFileSync('./sticker1.webp') },
-            { data: readFileSync('./sticker2.jpg') }, // auto-convert ke webp
-            { data: readFileSync('./animated.webp') }, // animated juga support
+            { data: readFileSync('./sticker2.jpg') }, // auto-converted to webp
+            { data: readFileSync('./animated.webp') }, // animated is supported too
         ]
     }
 });
 ```
 
-Batas: 1–120 sticker per pack. Format input: webp, jpg, png (auto-convert). Animated webp support.
+Limit: 1–120 stickers per pack. Input formats: webp, jpg, png (auto-converted). Animated webp is supported.
 
 ---
 
@@ -296,20 +380,20 @@ await sock.sendMessage(jid, {
     react: { text: '👍', key: m.key }
 });
 
-// hapus react
+// remove reaction
 await sock.sendMessage(jid, {
     react: { text: '', key: m.key }
 });
 
-// hapus pesan (butuh admin kalau di grup)
+// delete message (requires admin in groups)
 await sock.sendMessage(jid, { delete: m.key });
 
-// pin pesan (type: 1=86400s, 2=604800s, 3=2592000s, 5=hapus pin)
+// pin message (type: 1=86400s, 2=604800s, 3=2592000s, 5=unpin)
 await sock.sendMessage(jid, {
     pin: { key: m.key, type: 1, time: 86400 }
 });
 
-// keep pesan (simpan ke starred)
+// keep message (save to starred)
 await sock.sendMessage(jid, {
     keep: { key: m.key, type: 1 }
 });
@@ -320,41 +404,41 @@ await sock.sendMessage(jid, {
 ## Poll & Event
 
 ```js
-// poll biasa (pilih satu)
+// single-choice poll
 await sock.sendMessage(jid, {
     poll: {
-        name: 'Pilih satu:',
-        values: ['Opsi A', 'Opsi B', 'Opsi C'],
+        name: 'Pick one:',
+        values: ['Option A', 'Option B', 'Option C'],
         selectableCount: 1
     }
 });
 
-// poll multi-pilih
+// multi-select poll
 await sock.sendMessage(jid, {
     poll: {
-        name: 'Pilih beberapa:',
+        name: 'Pick several:',
         values: ['A', 'B', 'C'],
-        selectableCount: 0  // 0 = boleh pilih semua
+        selectableCount: 0  // 0 = all selectable
     }
 });
 
-// poll untuk community announcement group
+// poll for an announcement community group
 await sock.sendMessage(jid, {
     poll: {
-        name: 'Voting:',
-        values: ['Ya', 'Tidak'],
+        name: 'Vote:',
+        values: ['Yes', 'No'],
         selectableCount: 1,
         toAnnouncementGroup: true
     }
 });
 
-// hasil poll (snapshot)
+// poll result (snapshot)
 await sock.sendMessage(jid, {
     pollResult: {
-        name: 'Nama Poll',
+        name: 'Poll Name',
         values: [
-            ['Opsi A', 42],
-            ['Opsi B', 17],
+            ['Option A', 42],
+            ['Option B', 17],
         ]
     }
 });
@@ -362,8 +446,8 @@ await sock.sendMessage(jid, {
 // event
 await sock.sendMessage(jid, {
     event: {
-        name: 'Nama Acara',
-        description: 'Deskripsi acara',
+        name: 'Event Name',
+        description: 'Event description',
         startDate: new Date('2026-07-01T09:00:00+07:00'),
         endDate: new Date('2026-07-01T17:00:00+07:00'),
         location: {
@@ -382,7 +466,7 @@ await sock.sendMessage(jid, {
 ## Payment & Order
 
 ```js
-// minta bayar
+// request payment
 await sock.sendMessage(jid, {
     payment: {
         currency: 'IDR',
@@ -390,7 +474,7 @@ await sock.sendMessage(jid, {
         offset: 0,
         expiry: Math.floor(Date.now() / 1000) + 86400,
         from: '628111@s.whatsapp.net',
-        note: 'Bayar dong',
+        note: 'Please pay',
     }
 });
 
@@ -410,7 +494,7 @@ await sock.sendMessage(jid, {
 ```js
 await sock.sendMessage(jid, {
     call: {
-        name: 'Meeting Mingguan',
+        name: 'Weekly Meeting',
         type: 1,  // 1 = voice, 2 = video
         time: Date.now() + 3600000
     }
@@ -419,66 +503,67 @@ await sock.sendMessage(jid, {
 
 ---
 
-## VoIP (Panggilan Suara)
+## VoIP (Voice Calls)
 
-`hiura-baileys` menyertakan modul VoIP lengkap (`lib/Voip/`) yang memungkinkan
-bot melakukan dan menangani **panggilan suara WhatsApp** secara programatik.
+`hiura-baileys` ships a complete VoIP module (`lib/Voip/`) that lets your
+bot make and handle **WhatsApp voice calls** programmatically.
 
-> **⚠️ Persyaratan tambahan:** VoIP membutuhkan `@roamhq/wrtc` (WebRTC native
-> addon, perlu compiler C++) dan berjalan di lingkungan Node.js desktop/server
-> dengan akses ke library WebRTC native. Tidak akan berfungsi di shared hosting
-> tanpa toolchain build (mis. Pterodactyl tanpa compiler).
+> **⚠️ Additional requirement:** VoIP requires `@roamhq/wrtc` (a native
+> WebRTC addon that needs a C++ compiler) and runs on desktop/server
+> Node.js environments with access to native WebRTC libraries. It will not
+> work on shared hosting without a build toolchain (e.g. Pterodactyl
+> without a compiler).
 
 ```bash
 npm install @roamhq/wrtc
 ```
 
-### Setup VoipClient
+### Setting up VoipClient
 
 ```js
 import { VoipClient } from 'hiura-baileys/lib/Voip/index.js';
-// atau CJS:
+// or CJS:
 const { VoipClient } = require('hiura-baileys/lib/Voip/index.js');
 
 const voip = new VoipClient(sock, creds);
 
-// Wajib: connect dulu sebelum bisa melakukan/menerima panggilan
+// Required: connect before you can make or receive calls
 await voip.connect();
 ```
 
-### Melakukan Panggilan
+### Making a Call
 
 ```js
-// Panggilan suara ke nomor WA
+// Voice call to a WhatsApp number
 const call = await voip.call('628xxxxxxxxx@s.whatsapp.net', {
-    audio: true,   // aktifkan audio (default: true)
+    audio: true,   // enable audio (default: true)
     video: false,  // video call (default: false)
 });
 
-// Event saat panggilan diangkat
+// Event when the call is answered
 call.on('accepted', () => {
-    console.log('Panggilan diterima!');
+    console.log('Call accepted!');
 });
 
-// Event saat panggilan berakhir
+// Event when the call ends
 call.on('ended', (reason) => {
-    console.log('Panggilan berakhir:', reason);
+    console.log('Call ended:', reason);
 });
 
-// Event error
+// Error event
 call.on('error', (err) => {
     console.error('VoIP error:', err);
 });
 
-// Akhiri panggilan manual
+// End the call manually
 call.end();
 
-// Mute/unmute mikrofon
+// Mute/unmute microphone
 call.mute(true);   // mute
 call.mute(false);  // unmute
 ```
 
-### Streaming Audio ke Panggilan
+### Streaming Audio Into a Call
 
 ```js
 import { readFileSync } from 'fs';
@@ -486,31 +571,31 @@ import { readFileSync } from 'fs';
 const call = await voip.call('628xxxxxxxxx@s.whatsapp.net');
 
 call.on('accepted', () => {
-    // Stream file audio (PCM/WAV) ke dalam panggilan
+    // Stream an audio file (PCM/WAV) into the call
     const audioBuffer = readFileSync('./audio.wav');
     call.sendAudio(audioBuffer);
 });
 ```
 
-### Menangani Panggilan Masuk
+### Handling Incoming Calls
 
 ```js
-// Tangani lewat event 'call' bawaan Baileys
+// Handle via Baileys' built-in 'call' event
 sock.ev.on('call', async ([callEvent]) => {
     if (callEvent.status === 'offer') {
-        // Tolak panggilan masuk
+        // Reject the incoming call
         await sock.rejectCall(callEvent.id, callEvent.from);
 
-        // Atau: jawab lewat VoipClient
+        // Or: answer via VoipClient
         // const activeCall = await voip.accept(callEvent);
     }
 });
 ```
 
-### Disconnect VoIP
+### Disconnecting VoIP
 
 ```js
-// Tutup koneksi VoIP saat bot shutdown
+// Close the VoIP connection when the bot shuts down
 voip.disconnect();
 ```
 
@@ -519,24 +604,24 @@ voip.disconnect();
 ## Group Invite & Newsletter Admin Invite
 
 ```js
-// undangan grup
+// group invite
 const code = await sock.groupInviteCode(groupJid);
 await sock.sendMessage(jid, {
     groupInvite: {
         inviteCode: code,
         inviteExpiration: Math.floor(Date.now() / 1000) + 86400 * 3,
         jid: groupJid,
-        subject: 'Nama Grup',
-        text: 'Gabung yuk!'
+        subject: 'Group Name',
+        text: 'Join us!'
     }
 });
 
-// undangan admin newsletter
+// newsletter admin invite
 await sock.sendMessage(jid, {
     adminInvite: {
         jid: '123456@newsletter',
-        name: 'Nama Saluran',
-        caption: 'Jadi admin saluran kami!',
+        name: 'Channel Name',
+        caption: 'Become an admin of our channel!',
         expiration: Math.floor(Date.now() / 1000) + 86400 * 7
     }
 });
@@ -547,46 +632,46 @@ await sock.sendMessage(jid, {
 ## Share Phone & Limit Sharing
 
 ```js
-// bagikan nomor telepon
+// share phone number
 await sock.sendMessage(jid, { sharePhoneNumber: true });
 
-// minta nomor telepon
+// request phone number
 await sock.sendMessage(jid, { requestPhoneNumber: true });
 
-// batasi sharing (privacy)
+// restrict sharing (privacy)
 await sock.sendMessage(jid, { limitSharing: true });
-await sock.sendMessage(jid, { limitSharing: false }); // cabut batasan
+await sock.sendMessage(jid, { limitSharing: false }); // lift the restriction
 ```
 
 ---
 
 ## List Reply & Button Reply
 
-Untuk membalas pesan interaktif yang masuk:
+For replying to incoming interactive messages:
 
 ```js
-// balas list (single_select)
+// reply to a list (single_select)
 await sock.sendMessage(jid, {
-    buttonReply: { title: 'Judul Item', description: 'Deskripsi', rowId: 'row_id' },
+    buttonReply: { title: 'Item Title', description: 'Description', rowId: 'row_id' },
     type: 'list'
 });
 
-// balas template button
+// reply to a template button
 await sock.sendMessage(jid, {
-    buttonReply: { displayText: 'Teks Tombol', id: 'button_id', index: 0 },
+    buttonReply: { displayText: 'Button Text', id: 'button_id', index: 0 },
     type: 'template'
 });
 
-// balas plain button
+// reply to a plain button
 await sock.sendMessage(jid, {
-    buttonReply: { id: 'button_id', displayText: 'Teks Tombol' },
+    buttonReply: { id: 'button_id', displayText: 'Button Text' },
     type: 'plain'
 });
 
-// balas native flow / interactive button
+// reply to a native flow / interactive button
 await sock.sendMessage(jid, {
     buttonReply: {
-        displayText: 'Teks',
+        displayText: 'Text',
         nativeFlows: {
             name: 'quick_reply',
             paramsJson: JSON.stringify({ id: 'btn_id' }),
@@ -596,11 +681,11 @@ await sock.sendMessage(jid, {
     type: 'interactive'
 });
 
-// balas list response (listReply)
+// list response (listReply)
 await sock.sendMessage(jid, {
     listReply: {
         singleSelectReply: { selectedRowId: 'row_id' },
-        title: 'Pilihan',
+        title: 'Selection',
         listType: 1
     }
 });
@@ -614,23 +699,23 @@ await sock.sendMessage(jid, {
 await sock.sendMessage(jid, {
     sections: [
         {
-            title: 'Kategori 1',
+            title: 'Category 1',
             rows: [
-                { title: 'Item A', description: 'Deskripsi A', id: 'item_a' },
-                { title: 'Item B', description: 'Deskripsi B', id: 'item_b' },
+                { title: 'Item A', description: 'Description A', id: 'item_a' },
+                { title: 'Item B', description: 'Description B', id: 'item_b' },
             ]
         },
         {
-            title: 'Kategori 2',
+            title: 'Category 2',
             rows: [
                 { title: 'Item C', id: 'item_c' },
             ]
         }
     ],
-    title: 'Judul List',
-    buttonText: 'Lihat Pilihan',
-    text: 'Pilih salah satu:',
-    footer: 'footer teks',
+    title: 'List Title',
+    buttonText: 'View Options',
+    text: 'Pick one:',
+    footer: 'footer text',
     mentions: ['628111@s.whatsapp.net'],
 }, { quoted: m });
 ```
@@ -643,7 +728,7 @@ await sock.sendMessage(jid, {
 await sock.sendMessage(jid, {
     productList: [
         {
-            title: 'Kategori Produk',
+            title: 'Product Category',
             products: [
                 { productId: 'prod_1' },
                 { productId: 'prod_2' },
@@ -651,9 +736,9 @@ await sock.sendMessage(jid, {
         }
     ],
     businessOwnerJid: '628111@s.whatsapp.net',
-    title: 'Katalog',
-    buttonText: 'Lihat Produk',
-    text: 'Produk kami:',
+    title: 'Catalog',
+    buttonText: 'View Products',
+    text: 'Our products:',
     footer: 'footer',
     thumbnail: readFileSync('./thumb.jpg'),
 }, { quoted: m });
@@ -666,11 +751,11 @@ await sock.sendMessage(jid, {
 ```js
 await sock.sendMessage(jid, {
     buttons: [
-        { buttonId: 'id1', buttonText: { displayText: 'Tombol 1' }, type: 1 },
-        { buttonId: 'id2', buttonText: { displayText: 'Tombol 2' }, type: 1 },
-        { buttonId: 'id3', buttonText: { displayText: 'Tombol 3' }, type: 1 },
+        { buttonId: 'id1', buttonText: { displayText: 'Button 1' }, type: 1 },
+        { buttonId: 'id2', buttonText: { displayText: 'Button 2' }, type: 1 },
+        { buttonId: 'id3', buttonText: { displayText: 'Button 3' }, type: 1 },
     ],
-    text: 'Pilih:',
+    text: 'Choose:',
     footer: 'footer',
     mentions: ['628111@s.whatsapp.net'],
 }, { quoted: m });
@@ -685,13 +770,13 @@ await sock.sendMessage(jid, {
     templateButtons: [
         {
             urlButton: {
-                displayText: 'Buka Website',
+                displayText: 'Open Website',
                 url: 'https://github.com'
             }
         },
         {
             callButton: {
-                displayText: 'Telepon',
+                displayText: 'Call',
                 phoneNumber: '+6281234567890'
             }
         },
@@ -712,7 +797,7 @@ await sock.sendMessage(jid, {
 
 ## Interactive Buttons (Native Flow)
 
-Ini yang paling fleksibel dan support semua tipe button modern WA:
+The most flexible option, supporting every modern WA button type:
 
 ```js
 await sock.sendMessage(jid, {
@@ -720,35 +805,36 @@ await sock.sendMessage(jid, {
         // quick reply
         {
             name: 'quick_reply',
-            buttonParamsJson: JSON.stringify({ display_text: 'Ya', id: 'yes' })
+            buttonParamsJson: JSON.stringify({ display_text: 'Yes', id: 'yes' })
         },
-        // buka URL
+        // open a URL
         {
             name: 'cta_url',
             buttonParamsJson: JSON.stringify({
-                display_text: 'Buka Link',
+                display_text: 'Open Link',
                 url: 'https://github.com',
                 merchant_url: 'https://github.com'
             })
         },
-        // telepon
+        // call
         {
             name: 'cta_call',
             buttonParamsJson: JSON.stringify({
-                display_text: 'Hubungi',
+                display_text: 'Contact',
                 phone_number: '6281234567890'
             })
         },
-        // salin teks
+        // copy text
         {
             name: 'cta_copy',
             buttonParamsJson: JSON.stringify({
-                display_text: 'Salin Kode',
+                display_text: 'Copy Code',
                 id: 'copy_id',
-                copy_code: 'KODE123'
+                copy_code: 'CODE123'
             })
         },
-        // kirim lokasi
+        // send location
+        // (v1.5.3+: the shorthand `{ type: 'location' }` also resolves correctly)
         { name: 'send_location', buttonParamsJson: '' },
         // address message
         { name: 'address_message', buttonParamsJson: '' },
@@ -756,9 +842,9 @@ await sock.sendMessage(jid, {
         {
             name: 'single_select',
             buttonParamsJson: JSON.stringify({
-                title: 'Buka Menu',
+                title: 'Open Menu',
                 sections: [{
-                    title: 'Pilihan',
+                    title: 'Options',
                     rows: [
                         { title: 'Menu 1', description: 'desc', id: 'menu1' },
                         { title: 'Menu 2', id: 'menu2' },
@@ -767,11 +853,11 @@ await sock.sendMessage(jid, {
             })
         },
     ],
-    text: 'Isi pesan',
-    title: 'Judul header',
-    subtitle: 'Subjudul',
-    footer: 'Footer teks',
-    // media di header (opsional, pilih salah satu)
+    text: 'Message body',
+    title: 'Header title',
+    subtitle: 'Subtitle',
+    footer: 'Footer text',
+    // header media (optional, pick one)
     image: { url: 'https://...' },
     // video: { url: 'https://...' },
     // document: { url: 'https://...' },
@@ -779,9 +865,14 @@ await sock.sendMessage(jid, {
 }, { quoted: m });
 ```
 
-### Dengan raw `generateWAMessageFromContent`
+> **Buttons not rendering?** If you're on a version older than v1.5.3, see
+> the critical fix noted in the [Changelog](#changelog) — a shadowed
+> `sendMessage` key meant the button wrapper was never attached for any
+> button type. Upgrading resolves it.
 
-Untuk kontrol penuh atas struktur proto:
+### With raw `generateWAMessageFromContent`
+
+For full control over the proto structure:
 
 ```js
 import { generateWAMessageFromContent, prepareWAMessageMedia, proto } from 'hiura-baileys';
@@ -793,10 +884,10 @@ const media = await prepareWAMessageMedia(
 
 const msg = generateWAMessageFromContent(jid, {
     interactiveMessage: proto.Message.InteractiveMessage.create({
-        body: { text: 'Isi pesan' },
+        body: { text: 'Message body' },
         footer: { text: 'Footer' },
         header: {
-            title: 'Judul',
+            title: 'Title',
             hasMediaAttachment: true,
             ...media
         },
@@ -820,11 +911,11 @@ await sock.relayMessage(jid, msg.message, { messageId: msg.key.id });
 // shop storefront
 await sock.sendMessage(jid, {
     shop: { surface: 1, id: 'SHOP_ID' },
-    text: 'Kunjungi toko',
-    title: 'Toko Kami',
-    footer: 'Tersedia sekarang'
+    text: 'Visit the shop',
+    title: 'Our Shop',
+    footer: 'Available now'
 });
-// atau gaya lama: shop: 1, id: 'SHOP_ID'
+// or the old style: shop: 1, id: 'SHOP_ID'
 
 // collection
 await sock.sendMessage(jid, {
@@ -833,42 +924,42 @@ await sock.sendMessage(jid, {
         id: 'COLLECTION_ID',
         version: 1
     },
-    text: 'Koleksi terbaru',
-    title: 'Koleksi',
-    footer: 'Cek sekarang'
+    text: 'Latest collection',
+    title: 'Collection',
+    footer: 'Check it out'
 });
 
 // cards (shorthand via sendMessage)
 await sock.sendMessage(jid, {
     cards: [
         {
-            title: 'Produk A',
-            body: 'Harga: Rp 100.000',
+            title: 'Product A',
+            body: 'Price: Rp 100,000',
             footer: 'footer',
             image: { url: 'https://...' },
             buttons: [
-                { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Beli', id: 'beli_a' }) }
+                { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Buy', id: 'buy_a' }) }
             ]
         },
         {
-            title: 'Produk B',
-            body: 'Harga: Rp 150.000',
+            title: 'Product B',
+            body: 'Price: Rp 150,000',
             image: { url: 'https://...' },
             buttons: [
-                { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Beli', id: 'beli_b' }) }
+                { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Buy', id: 'buy_b' }) }
             ]
         }
     ],
-    text: 'Pilih produk:',
+    text: 'Choose a product:',
     footer: 'footer'
 });
 ```
 
 ---
 
-## Carousel (raw)
+## Carousel (Raw)
 
-Untuk carousel dengan media tiap card, gunakan `generateWAMessageFromContent`:
+For a carousel with media on each card, use `generateWAMessageFromContent`:
 
 ```js
 import { generateWAMessageFromContent, prepareWAMessageMedia, proto } from 'hiura-baileys';
@@ -887,18 +978,18 @@ async function makeCard(imageUrl, bodyText, buttons) {
 }
 
 const cards = await Promise.all([
-    makeCard('https://.../a.jpg', 'Produk A\nRp 100.000', [
-        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Beli A', id: 'beli_a' }) },
-        { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Detail', url: 'https://...', merchant_url: 'https://...' }) }
+    makeCard('https://.../a.jpg', 'Product A\nRp 100,000', [
+        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Buy A', id: 'buy_a' }) },
+        { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Details', url: 'https://...', merchant_url: 'https://...' }) }
     ]),
-    makeCard('https://.../b.jpg', 'Produk B\nRp 150.000', [
-        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Beli B', id: 'beli_b' }) }
+    makeCard('https://.../b.jpg', 'Product B\nRp 150,000', [
+        { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'Buy B', id: 'buy_b' }) }
     ]),
 ]);
 
 const msg = generateWAMessageFromContent(jid, {
     interactiveMessage: proto.Message.InteractiveMessage.create({
-        body: { text: 'Pilih produk:' },
+        body: { text: 'Choose a product:' },
         footer: { text: 'footer' },
         header: { title: '', hasMediaAttachment: false },
         carouselMessage: {
@@ -914,17 +1005,18 @@ await sock.relayMessage(jid, msg.message, { messageId: msg.key.id });
 
 ---
 
-## Interaktif — handleInteractive (via Hiura Engine)
+## Interactive Messages (Hiura Engine)
 
-Untuk kasus sendMessage yang butuh media + buttons tapi format lebih ringkas:
+For cases where you need media + buttons via `sendMessage` with a more
+compact format:
 
 ```js
-// Hiura Engine otomatis mendeteksi tipe dan meng-handle upload
+// Hiura Engine automatically detects the type and handles the upload
 await sock.sendMessage(jid, {
     interactiveMessage: {
-        title: 'Judul Header',
+        title: 'Header Title',
         footer: 'Footer',
-        image: { url: 'https://...' },    // atau video/document
+        image: { url: 'https://...' },    // or video/document
         buttons: [
             { name: 'quick_reply', buttonParamsJson: JSON.stringify({ display_text: 'A', id: 'a' }) }
         ],
@@ -932,8 +1024,8 @@ await sock.sendMessage(jid, {
             mentionedJid: ['628111@s.whatsapp.net']
         },
         externalAdReply: {
-            title: 'Judul Ad',
-            body: 'Body Ad',
+            title: 'Ad Title',
+            body: 'Ad Body',
             mediaUrl: 'https://...',
             sourceUrl: 'https://...'
         }
@@ -945,32 +1037,32 @@ await sock.sendMessage(jid, {
 
 ## Rich Messages (Hiura Engine)
 
-Semua fungsi di bawah ini tersedia langsung di objek `sock`:
+All of the functions below are available directly on the `sock` object:
 
-### Tabel
+### Table
 
 ```js
-// tabel sederhana
+// simple table
 await sock.sendTable(
     jid,
-    'Judul Tabel',
-    ['Kolom A', 'Kolom B', 'Kolom C'],
+    'Table Title',
+    ['Column A', 'Column B', 'Column C'],
     [
         ['data 1', 'data 2', 'data 3'],
         ['data 4', 'data 5', 'data 6'],
     ],
-    m,       // quoted (opsional)
+    m,       // quoted (optional)
     {}       // options
 );
 
-// tabel v2 (format objek)
+// table v2 (object format)
 await sock.sendTableV2(
     jid,
     {
-        title: 'Judul',
+        title: 'Title',
         headers: ['A', 'B'],
         rows: [['1', '2'], ['3', '4']],
-        footer: 'footer opsional'
+        footer: 'optional footer'
     },
     m,
     {}
@@ -982,8 +1074,8 @@ await sock.sendTableV2(
 ```js
 await sock.sendList(
     jid,
-    'Judul List',
-    ['item pertama', 'item kedua', 'item ketiga'],
+    'List Title',
+    ['first item', 'second item', 'third item'],
     m,
     {}
 );
@@ -996,19 +1088,19 @@ await sock.sendList(
 await sock.sendCodeBlock(
     jid,
     {
-        language: 'javascript',  // js, python, cpp, go, rust, lua, css, html, bash, dll.
+        language: 'javascript',  // js, python, cpp, go, rust, lua, css, html, bash, etc.
         code: 'console.log("hello world")'
     },
     m,
     {}
 );
 
-// code block v2 (dengan judul)
+// code block v2 (with title)
 await sock.sendCodeBlockV2(
     jid,
     {
         language: 'python',
-        title: 'Contoh Python',
+        title: 'Python Example',
         code: 'print("hello world")'
     },
     m,
@@ -1022,12 +1114,12 @@ await sock.sendCodeBlockV2(
 // link v1
 await sock.sendLink(
     jid,
-    'Teks pesan',
+    'Message text',
     [
         {
             url: 'https://github.com',
             title: 'GitHub',
-            description: 'Deskripsi link'
+            description: 'Link description'
         }
     ],
     m,
@@ -1035,43 +1127,43 @@ await sock.sendLink(
 );
 
 // link v2
-await sock.sendLinkV2(jid, 'Teks', links, m, {});
+await sock.sendLinkV2(jid, 'Text', links, m, {});
 ```
 
-### Latex
+### LaTeX
 
 ```js
-// latex teks (render sisi WA)
+// LaTeX text (rendered on the WA side)
 await sock.sendLatex(
     jid,
     m,
-    { formula: 'E = mc^2', caption: 'Rumus Einstein' }
+    { formula: 'E = mc^2', caption: 'Einstein\'s formula' }
 );
 
-// latex sebagai gambar (butuh render function)
+// LaTeX as an image (requires a render function)
 await sock.sendLatexImage(
     jid,
     m,
     { formula: '\\int_0^\\infty e^{-x} dx = 1', caption: 'Integral' },
-    renderLatexToPng,   // fungsi custom untuk render latex → PNG buffer
+    renderLatexToPng,   // custom function to render LaTeX → PNG buffer
     sock.waUploadToServer
 );
 
-// latex inline image
+// LaTeX inline image
 await sock.sendLatexInlineImage(jid, m, options, renderFn, uploadFn);
 ```
 
-### Rich Message (gabungan)
+### Rich Message (combined)
 
 ```js
 await sock.sendRichMessage(
     jid,
     [
-        { type: 'text', text: 'Intro teks' },
+        { type: 'text', text: 'Intro text' },
         { type: 'code', language: 'js', code: 'const x = 1 + 1;' },
-        { type: 'list', title: 'Daftar', items: ['a', 'b', 'c'] },
+        { type: 'list', title: 'List', items: ['a', 'b', 'c'] },
         { type: 'table', title: 'Data', headers: ['K', 'V'], rows: [['key', 'val']] },
-        { type: 'link', text: 'Info', links: [{ url: 'https://...', title: 'Judul' }] }
+        { type: 'link', text: 'Info', links: [{ url: 'https://...', title: 'Title' }] }
     ],
     m,
     {}
@@ -1080,7 +1172,7 @@ await sock.sendRichMessage(
 
 ### Unified Response
 
-Untuk reply ke bot response message:
+For replying to a bot response message:
 
 ```js
 const captured = await sock.captureUnifiedResponse(jid, m);
@@ -1091,45 +1183,45 @@ await sock.sendUnifiedResponse(jid, m, captured);
 
 ```js
 await sock.sendPreview(jid, {
-    text: 'Deskripsi',
+    text: 'Description',
     url: 'https://github.com',
-    title: 'Judul',
-    description: 'Deskripsi preview',
-    image: 'https://.../preview.jpg',  // atau Buffer
+    title: 'Title',
+    description: 'Preview description',
+    image: 'https://.../preview.jpg',  // or a Buffer
     matchedText: 'https://github.com'
 }, { quoted: m });
 ```
 
 ---
 
-## Group Story / Status Grup
+## Group Story / Group Status
 
 ```js
-// kirim status ke grup tertentu
-await sock.swgc(groupJid, { text: 'Status grup!' });
+// send a status to a specific group
+await sock.swgc(groupJid, { text: 'Group status!' });
 await sock.swgc(groupJid, { image: { url: 'https://...' }, caption: 'Status' });
 
-// shorthand untuk sendStatusWhatsApp
+// shorthand for sendStatusWhatsApp
 await sock.sendStatusMention({ text: 'Status!' }, [groupJid, userJid]);
 ```
 
 ---
 
-## Status / Story WA
+## Status / WA Story
 
 ```js
-// kirim ke semua kontak
+// send to all contacts
 await sock.sendStatusWhatsApp({ text: 'Status!' });
 await sock.sendStatusWhatsApp({ image: { url: 'https://...' }, caption: 'Caption' });
 
-// kirim ke kontak/grup spesifik
+// send to specific contacts/groups
 await sock.sendStatusWhatsApp(
-    { text: 'Khusus untuk group ini!' },
+    { text: 'Just for this group!' },
     ['628111@s.whatsapp.net', groupJid]
 );
 
 // alias
-await sock.sendStatusMention({ text: 'halo' }, jids);
+await sock.sendStatusMention({ text: 'hello' }, jids);
 ```
 
 ---
@@ -1137,21 +1229,21 @@ await sock.sendStatusMention({ text: 'halo' }, jids);
 ## Ephemeral / Disappearing Messages
 
 ```js
-// aktifkan disappearing di chat/grup
+// enable disappearing messages in a chat/group
 await sock.sendMessage(jid, {
     disappearingMessagesInChat: true
-    // atau: 86400, 604800, 2592000 (durasi detik)
+    // or: 86400, 604800, 2592000 (duration in seconds)
 });
 
-// nonaktifkan
+// disable
 await sock.sendMessage(jid, { disappearingMessagesInChat: false });
 
-// cek durasi ephemeral di grup
+// check a group's ephemeral duration
 const expiration = await sock.getEphemeralGroup(groupJid);
-// return: 0 | 86400 | 604800 | 2592000
+// returns: 0 | 86400 | 604800 | 2592000
 
-// sendMessage otomatis ikut ephemeral setting grup
-// tidak perlu set ephemeralExpiration manual
+// sendMessage automatically follows the group's ephemeral setting —
+// no need to set ephemeralExpiration manually
 ```
 
 ---
@@ -1162,72 +1254,72 @@ const expiration = await sock.getEphemeralGroup(groupJid);
 // metadata
 const meta = await sock.groupMetadata(jid);
 
-// buat grup
-const { id } = await sock.groupCreate('Nama Grup', [
+// create a group
+const { id } = await sock.groupCreate('Group Name', [
     '628111@s.whatsapp.net',
     '628222@s.whatsapp.net'
 ]);
 
-// kelola peserta
+// manage participants
 await sock.groupParticipantsUpdate(jid, ['628111@s.whatsapp.net'], 'add');
 await sock.groupParticipantsUpdate(jid, ['628111@s.whatsapp.net'], 'remove');
 await sock.groupParticipantsUpdate(jid, ['628111@s.whatsapp.net'], 'promote');
 await sock.groupParticipantsUpdate(jid, ['628111@s.whatsapp.net'], 'demote');
 
-// update info grup
-await sock.groupUpdateSubject(jid, 'Nama Baru');
-await sock.groupUpdateDescription(jid, 'Deskripsi baru');
+// update group info
+await sock.groupUpdateSubject(jid, 'New Name');
+await sock.groupUpdateDescription(jid, 'New description');
 
-// setting grup
-await sock.groupSettingUpdate(jid, 'announcement');  // hanya admin bisa kirim
+// group settings
+await sock.groupSettingUpdate(jid, 'announcement');  // only admins can send
 await sock.groupSettingUpdate(jid, 'not_announcement');
-await sock.groupSettingUpdate(jid, 'locked');         // hanya admin edit info
+await sock.groupSettingUpdate(jid, 'locked');         // only admins can edit info
 await sock.groupSettingUpdate(jid, 'unlocked');
 
-// ephemeral grup
-await sock.groupToggleEphemeral(jid, 86400);   // aktifkan
-await sock.groupToggleEphemeral(jid, 0);       // nonaktifkan
+// group ephemeral
+await sock.groupToggleEphemeral(jid, 86400);   // enable
+await sock.groupToggleEphemeral(jid, 0);       // disable
 
 // invite
 const code = await sock.groupInviteCode(jid);
 await sock.groupAcceptInvite(code);
 await sock.groupRevokeInvite(jid);
 
-// foto profil grup
-await sock.updateProfilePicture(jid, readFileSync('./foto.jpg'));
+// group profile picture
+await sock.updateProfilePicture(jid, readFileSync('./photo.jpg'));
 await sock.removeProfilePicture(jid);
 
-// keluar
+// leave
 await sock.groupLeave(jid);
 ```
 
 ---
 
-## Newsletter (Saluran)
+## Newsletter (Channels)
 
 ```js
-// info saluran
+// channel info
 const info = await sock.getNewsletterInfo('jid@newsletter');
 const infoByInvite = await sock.getNewsletterInfoFromInvite('https://whatsapp.com/channel/...');
 
-// buat saluran baru
+// create a new channel
 const nl = await sock.createNewsletter({
-    name: 'Nama Saluran',
-    description: 'Deskripsi saluran',
-    picture: readFileSync('./foto.jpg')  // opsional
+    name: 'Channel Name',
+    description: 'Channel description',
+    picture: readFileSync('./photo.jpg')  // optional
 });
 
-// kelola
+// manage
 await sock.followNewsletter('jid@newsletter');
 await sock.unfollowNewsletter('jid@newsletter');
 await sock.muteNewsletter('jid@newsletter', true);
-await sock.updateNewsletterMetadata('jid@newsletter', { name: 'Nama Baru', description: 'Desc baru' });
+await sock.updateNewsletterMetadata('jid@newsletter', { name: 'New Name', description: 'New desc' });
 
-// kirim ke saluran
-await sock.sendMessage('jid@newsletter', { text: 'Post pertama' });
-await sock.sendMessage('jid@newsletter', { image: { url: 'https://...' }, caption: 'Foto' });
+// post to a channel
+await sock.sendMessage('jid@newsletter', { text: 'First post' });
+await sock.sendMessage('jid@newsletter', { image: { url: 'https://...' }, caption: 'Photo' });
 
-// react ke post saluran
+// react to a channel post
 await sock.newsletterReactMessage('jid@newsletter', serverId, '👍');
 ```
 
@@ -1271,13 +1363,15 @@ isLidUser('628111@lid')                         // true
 
 ## Decrypt Handler
 
-Fungsi untuk decrypt pesan terenkripsi. Semua sudah diintegrasikan otomatis di `processMessage` — tidak perlu setup tambahan. Event berikut otomatis di-emit:
+Functions for decrypting encrypted messages. All of them are already wired
+into `processMessage` automatically — no extra setup needed. The following
+events are emitted automatically:
 
-- `decryptEventEdit` → emit `messages.update`
-- `decryptComment` → emit `messages.upsert`
-- `decryptReaction` → emit `messages.upsert`
+- `decryptEventEdit` → emits `messages.update`
+- `decryptComment` → emits `messages.upsert`
+- `decryptReaction` → emits `messages.upsert`
 
-Kalau butuh decrypt manual:
+If you need to decrypt manually:
 
 ```js
 import {
@@ -1329,7 +1423,7 @@ import pino from 'pino';
 
 const store = makeInMemoryStore({ logger: pino({ level: 'silent' }) });
 
-// baca/tulis ke file
+// read/write to a file
 store.readFromFile('./data/store.json');
 setInterval(() => store.writeToFile('./data/store.json'), 10_000);
 
@@ -1341,12 +1435,12 @@ const sock = makeWASocket({
 
 store.bind(sock.ev);
 
-// akses data
-store.chats                          // semua chat
-store.messages['jid@g.us'].array    // semua pesan di jid tertentu
-store.contacts                       // semua kontak
-store.groupMetadata                  // metadata grup yang sudah di-fetch
-store.loadMessage(jid, id)           // cari pesan by id
+// accessing data
+store.chats                          // all chats
+store.messages['jid@g.us'].array    // all messages for a given jid
+store.contacts                       // all contacts
+store.groupMetadata                  // group metadata that's been fetched
+store.loadMessage(jid, id)           // find a message by id
 ```
 
 ---
@@ -1363,16 +1457,16 @@ import {
     initAuthCreds
 } from 'hiura-baileys';
 
-// default — simpan ke folder
+// default — save to a folder
 const { state, saveCreds } = await useMultiFileAuthState('./sessions');
 
-// simpan ke satu file json
+// save to a single JSON file
 const { state, saveCreds } = await useSingleFileAuthState('./session.json');
 
 // MongoDB
 const { state, saveCreds } = await useMongoFileAuthState(mongoCollection);
 
-// dengan cache (performa lebih baik)
+// with caching (better performance)
 const sock = makeWASocket({
     auth: {
         creds: state.creds,
@@ -1383,7 +1477,7 @@ const sock = makeWASocket({
 
 ---
 
-## Menangani Pesan Masuk
+## Handling Incoming Messages
 
 ```js
 sock.ev.on('messages.upsert', async ({ messages, type }) => {
@@ -1391,19 +1485,19 @@ sock.ev.on('messages.upsert', async ({ messages, type }) => {
 
     for (const m of messages) {
         if (!m.message) continue;
-        if (m.key.fromMe) continue;   // skip pesan sendiri
+        if (m.key.fromMe) continue;   // skip our own messages
 
         const jid = m.key.remoteJid;
-        const sender = m.key.participant || jid;    // participant untuk grup
+        const sender = m.key.participant || jid;    // participant for groups
 
-        // ambil isi teks
+        // get text content
         const text = m.message?.conversation
             || m.message?.extendedTextMessage?.text
             || m.message?.imageMessage?.caption
             || m.message?.videoMessage?.caption
             || '';
 
-        // cek quoted
+        // check for a quoted message
         const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
         const quotedKey = {
             id: m.message?.extendedTextMessage?.contextInfo?.stanzaId,
@@ -1418,7 +1512,7 @@ sock.ev.on('messages.upsert', async ({ messages, type }) => {
     }
 });
 
-// update status pesan (read receipt dll.)
+// message status updates (read receipts, etc.)
 sock.ev.on('messages.update', (updates) => {
     for (const { key, update } of updates) {
         console.log(key, update);
@@ -1444,28 +1538,28 @@ sock.ev.on('messages.upsert', ({ messages }) => {
 
 ---
 
-## Tipografi & contextInfo
+## Typography & contextInfo
 
 ```js
 // bold
-await sock.sendMessage(jid, { text: '*teks bold*' });
+await sock.sendMessage(jid, { text: '*bold text*' });
 
 // italic
-await sock.sendMessage(jid, { text: '_teks italic_' });
+await sock.sendMessage(jid, { text: '_italic text_' });
 
 // strikethrough
-await sock.sendMessage(jid, { text: '~teks coret~' });
+await sock.sendMessage(jid, { text: '~strikethrough text~' });
 
 // monospace
-await sock.sendMessage(jid, { text: '`kode`' });
+await sock.sendMessage(jid, { text: '`code`' });
 
-// pesan dengan externalAdReply (banner iklan style)
+// message with externalAdReply (ad-banner style)
 await sock.sendMessage(jid, {
-    text: 'Teks utama',
+    text: 'Main text',
     contextInfo: {
         externalAdReply: {
-            title: 'Judul Banner',
-            body: 'Deskripsi',
+            title: 'Banner Title',
+            body: 'Description',
             mediaType: 1,
             thumbnailUrl: 'https://.../thumb.jpg',
             sourceUrl: 'https://...',
@@ -1476,10 +1570,10 @@ await sock.sendMessage(jid, {
     }
 });
 
-// forward message dengan skor
+// forward a message with a score
 await sock.sendMessage(jid, {
     forward: m,
-    force: true  // paksa forward walaupun sudah pernah diforward
+    force: true  // force a forward even if already forwarded before
 });
 ```
 
@@ -1490,7 +1584,7 @@ await sock.sendMessage(jid, {
 ```js
 import { DisconnectReason } from 'hiura-baileys';
 
-// semua nilai
+// all values
 DisconnectReason.connectionClosed       // 428
 DisconnectReason.connectionLost         // 408
 DisconnectReason.connectionReplaced     // 440
@@ -1503,13 +1597,13 @@ DisconnectReason.forbidden             // 403
 DisconnectReason.unavailableService    // 503
 DisconnectReason.restartRequired       // 515
 
-// contoh penggunaan
+// example usage
 sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
     if (connection === 'close') {
         const statusCode = new Boom(lastDisconnect?.error)?.output?.statusCode;
         const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
         if (shouldReconnect) start();
-        else console.log('Session expired, perlu scan ulang');
+        else console.log('Session expired, please scan again');
     }
 });
 ```
@@ -1521,14 +1615,14 @@ sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
 ```js
 import { Browsers } from 'hiura-baileys';
 
-// preset browser yang tersedia
+// available browser presets
 Browsers.ubuntu('Chrome')
 Browsers.macOS('Desktop')
 Browsers.windows('Edge')
 Browsers.baileys('Desktop')    // default
 Browsers.appropriate('Chrome')
 
-// pakai di config
+// use in config
 const sock = makeWASocket({
     browser: Browsers.ubuntu('Chrome'),
     ...
@@ -1539,9 +1633,9 @@ const sock = makeWASocket({
 
 ## FAQ
 
-**Button/interactive tidak muncul di grup**
+**Buttons/interactive not showing up in groups**
 
-Tambahkan `additionalNodes` saat `relayMessage`:
+Add `additionalNodes` when calling `relayMessage`:
 
 ```js
 await sock.relayMessage(jid, msg.message, {
@@ -1558,41 +1652,42 @@ await sock.relayMessage(jid, msg.message, {
 });
 ```
 
-**Mention LID tidak jalan di grup**
+**LID mentions don't work in groups**
 
 ```js
 import { normalizeMentionJid } from 'hiura-baileys';
 
 const fixedJid = normalizeMentionJid(lidJid);
 await sock.sendMessage(groupJid, {
-    text: `@${fixedJid.split('@')[0]} halo`,
+    text: `@${fixedJid.split('@')[0]} hello`,
     mentions: [fixedJid]
 });
 ```
 
-**Session logout terus**
+**Session keeps logging out**
 
-- Pastikan `sock.ev.on('creds.update', saveCreds)` terpasang
-- Jangan jalankan dua instance dengan folder session yang sama
-- Hapus folder session lalu scan ulang: `rm -rf ./sessions`
+- Make sure `sock.ev.on('creds.update', saveCreds)` is wired up
+- Don't run two instances against the same session folder
+- Delete the session folder and scan again: `rm -rf ./sessions`
 
-**CJS `require()` gagal / error `ERR_REQUIRE_ESM`**
+**CJS `require()` throws / `require('hiura-baileys')` doesn't work**
 
-Sejak v1.5.1, ini berarti Node.js Anda lebih lama dari v20.19.0 atau
-v22.12.0 — `require(esm)` belum tersedia secara native di versi Anda.
-Error yang muncul akan menyebutkan versi Node Anda saat ini dan
-minimum yang dibutuhkan. Solusinya: upgrade Node.js (`nvm install 22`
-atau setara). Tidak ada workaround lain — fitur ini butuh dukungan
-langsung dari Node.js itu sendiri, bukan sesuatu yang bisa di-polyfill.
+As of v1.5.3 this is expected behavior, not a bug: `index.cjs` is a static
+shim that immediately throws, pointing you to `import` or
+`await import()`, regardless of your Node version. Solution: use
+`await import('hiura-baileys')` inside an async function, or convert your
+entry file to ESM. There's no synchronous-`require()` workaround anymore —
+see [Requirements](#requirements) for the reasoning.
 
-Kalau Anda masih di v1.5.0 ke bawah dan belum sempat update package
-ini: pastikan pakai `await` sebelum akses konstanta enum pertama kali,
-atau gunakan `require('hiura-baileys').ready.then(...)`. Paling
-gampang: `await useMultiFileAuthState()` sudah cukup untuk memastikan
-semua siap di versi lama itu. (Workaround ini tidak diperlukan lagi di
-v1.5.1+.)
+> **Still on v1.5.0 or older?** That version had a different issue —
+> non-function constants (`proto`, `BufferJSON`, `DisconnectReason`, etc.)
+> only became available after some function had already been `await`-ed,
+> so destructuring at the very top of a file threw a "not ready" error.
+> Adding `await useMultiFileAuthState()` before touching any constant
+> worked around it back then, but that workaround is irrelevant since
+> v1.5.1 — upgrading to the latest version is the real fix either way.
 
-**Error `sharp` saat sendMessage album/stickerPack**
+**`sharp` error when sending album/stickerPack**
 
 Install sharp: `npm install sharp`
 
@@ -1600,47 +1695,154 @@ Install sharp: `npm install sharp`
 
 ## Changelog
 
-### v1.5.1
-- **CJS entry point ditulis ulang total** (`index.cjs`): sebelumnya pakai dynamic `import()` + lazy getter, di mana konstanta non-fungsi (`proto`, `BufferJSON`, `DisconnectReason`, dst) baru tersedia setelah ada fungsi yang sempat di-`await` duluan — kalau destructure di baris paling atas file, error "belum siap". Sekarang pakai `require(esm)` native Node (stabil sejak v20.19.0/v22.12.0) untuk load `lib/index.js` secara sinkron penuh, persis seperti CJS biasa.
-- Syarat Node.js naik jadi `>=20.19.0 <21.0.0 || >=22.12.0` (sebelumnya cuma cek major version `>=20`, yang tidak cukup ketat — Node 20.0–20.18 dan semua versi 21.x sebenarnya tidak didukung).
-- `engine-requirements.js` sekarang mengecek minor version juga, bukan cuma major, dengan pesan error yang lebih jelas.
-- **Auto-diagnosis `ERR_REQUIRE_ASYNC_MODULE`**: kalau `require(esm)` gagal karena ADA file di dependency graph yang punya top-level await (bukan `lib/index.js` sendiri, tapi salah satu dependency-nya), `index.cjs` sekarang otomatis menjalankan diagnosis `--experimental-print-required-tla` lewat child process dan mencetak nama file/baris yang jadi sumbernya langsung di error log — tidak perlu akses terminal manual untuk pakai flag itu sendiri.
-- **VoIP (panggilan suara)**: tambah modul `lib/Voip/` lengkap — `VoipClient` (connect, call, disconnect), `ActiveCall` (events: accepted/ended/error, mute, sendAudio), streaming audio ke dalam panggilan aktif, dan WASM engine WhatsApp di `lib/assets/wasm/`. Membutuhkan `@roamhq/wrtc` untuk berfungsi.
-- Tambah `buttonsMessage.locationMessage` sebagai header interactive — kirim tombol dengan lokasi sebagai media header (`{ location: {...}, buttons: [...] }`), beda dari `locationMessage` biasa yang berdiri sendiri.
-- `nativeFlowInfo` di tombol legacy (`buttonId`/`buttonText`) sekarang dipertahankan saat dikonversi ke `buttonsMessage`, jadi bisa campur tombol `quick_reply` biasa dengan `cta_url`/`cta_call` dalam satu pesan format lama.
+### v1.5.3
+
+**⚠️ Critical fix — buttons and `location_button` were never rendering
+correctly.** `Socket/messages-send.js` had two `sendMessage:` keys in the
+same returned object literal (a leftover from a previous merge). In a JS
+object literal the second key silently wins, so the first `sendMessage` —
+the only one that actually called `getButtonType()`/`getButtonArgs()` to
+attach the `<biz><interactive><native_flow>` wrapper WhatsApp requires for
+buttons to render — was 100% dead code. The live `sendMessage`, used for
+every `interactiveButtons` send, `carousel`, `product`-with-buttons, and
+the generic `buttonsMessage`/`templateMessage`/`listMessage` fallback,
+never attached that node at all. **This affected every button type**, not
+just `send_location`.
+- Removed the dead, shadowed `sendMessage` definition — there's now one
+  correct definition.
+- Wired `getButtonType()`/`getButtonArgs()` into the live `sendMessage`'s
+  dispatch cases (`PRODUCT`, `CAROUSEL`, `INTERACTIVE`,
+  `INTERACTIVE_BUTTONS`) and the generic fallback path, so the correct
+  button-specific `<biz>` node is attached every time.
+- Added a `{ type: 'location' }` / `{ type: 'send_location' }` shorthand to
+  `normalizeButtons()` (in both `Socket/hiura.js` and
+  `Socket/hiura-advanced.js`) — previously only the fully-spelled-out
+  `{ name: 'send_location', buttonParamsJson: '{}' }` form resolved
+  correctly.
+
+**Message-retry / session recovery** — a `<receipt type="retry">` can carry
+a fresh Signal key bundle for the requesting device; it's now injected
+directly instead of tearing the session down for a full renegotiation
+round trip. A base-key collision across repeated retries of the same
+message (a sign the session is stuck) now forces a fresh session instead
+of retrying indefinitely. Matters most in large, busy groups, where more
+devices means more decrypt failures and more retry receipts.
+
+**Device-list cache correctness (main fix for lag in large groups)** — the
+previous `case 'devices':` handler was a stub that never touched
+`userDevicesCache`, so the bot kept using a stale cached device list for
+up to 5 minutes after any group member added, removed, or changed a
+device — causing extra failed sends and retries. `handleDevicesNotification()`
+now properly updates/invalidates the cache, and a mutex protects concurrent
+writes to it.
+
+**Trusted-contact token (tctoken) freshness** — expiry now uses a 28-day
+rolling window (matching WA Web) instead of never expiring; outgoing
+`<tctoken>` now carries a timestamp attribute; an out-of-order or
+duplicate notification can no longer overwrite a newer stored token with
+an older one.
+
+**Event buffer cleanup** — added `destroy()` to clear timers, history
+cache, and listeners on socket close/logout (avoids leaking timers across
+reconnects), plus merge/dedupe logic for `pastParticipants` across
+history-sync chunks.
+
+**Interactive buttons audited, not changed** — compared feature-by-feature
+against the `levvleys` fork (native flow button names, low-level
+`<biz><native_flow>` stanza wrapping, proto-level message types); no
+functional gap found worth porting. Added English doc comments at the two
+key spots documenting how to send a location-request button.
+
+**ESM/CJS cleanup**
+- `index.cjs` rewritten: it previously used Node's synchronous
+  `require(esm)` to bridge into the ESM build, which only worked on Node
+  >=20.19.0 or >=22.12.0 — many hosting panels ship a "Node 22" that's
+  still below 22.12, so `require('hiura-baileys')` would fail there with a
+  confusing native `ERR_REQUIRE_ESM`. It's now a static,
+  version-independent shim that immediately throws a clear message
+  pointing to `import` (or `await import()` from CJS).
+- `engine-requirements.js` was dead code enforcing the same narrow
+  Node-version gate; it's now a no-op (kept in place in case anything
+  external still points at the file path).
+- `engines.node` in `package.json` relaxed from
+  `>=20.19.0 <21.0.0 || >=22.12.0` to `>=20.0.0`, matching upstream
+  baileys 7.0.0-rc14's own floor.
+- `lib/Voip/index.mjs` was **not** touched — it uses `createRequire()`,
+  which has no such version-fragility.
+
+### v1.5.2
+- **CJS entry point rewritten from scratch** (`index.cjs`): previously used a
+  dynamic `import()` + lazy getter, where non-function constants (`proto`,
+  `BufferJSON`, `DisconnectReason`, etc.) only became available after some
+  function had already been `await`-ed — destructuring at the very top of
+  the file threw a "not ready" error. Now uses Node's native `require(esm)`
+  (stable since v20.19.0/v22.12.0) to load `lib/index.js` fully
+  synchronously, just like a normal CJS module.
+- Node.js requirement raised to `>=20.19.0 <21.0.0 || >=22.12.0` (previously
+  only checked the major version `>=20`, which wasn't strict enough — Node
+  20.0–20.18 and all of 21.x were actually unsupported).
+- `engine-requirements.js` now checks the minor version too, not just the
+  major, with a clearer error message.
+- **Auto-diagnosis for `ERR_REQUIRE_ASYNC_MODULE`**: if `require(esm)` fails
+  because something in the dependency graph has a top-level await (not
+  `lib/index.js` itself, but one of its dependencies), `index.cjs` now
+  automatically runs a `--experimental-print-required-tla` diagnosis via a
+  child process and prints the source file/line straight into the error
+  log — no need to run the flag manually.
+- **VoIP (voice calls)**: added a complete `lib/Voip/` module —
+  `VoipClient` (connect, call, disconnect), `ActiveCall` (events:
+  accepted/ended/error, mute, sendAudio), audio streaming into an active
+  call, and WhatsApp's WASM engine under `lib/assets/wasm/`. Requires
+  `@roamhq/wrtc` to function.
+- Added `buttonsMessage.locationMessage` as an interactive header — send
+  buttons with a location as the media header (`{ location: {...}, buttons: [...] }`),
+  distinct from a standalone `locationMessage`.
+- `nativeFlowInfo` on legacy buttons (`buttonId`/`buttonText`) is now
+  preserved when converted to `buttonsMessage`, so regular `quick_reply`
+  buttons can be mixed with `cta_url`/`cta_call` in a single legacy-format
+  message.
 
 ### v1.5.0
-- Port `decryptEventEdit`, `decryptComment`, `decryptReaction` dan handler otomatisnya di processMessage
-- Tambah `meLid = creds.me?.lid` di processMessage
-- Quoted message: `quotedType = EXPLICIT` + `threadId VIEW_REPLIES` di grup
-- Fix shop API dual style: `{ shop: { surface, id } }` dan `{ shop: surface, id }` keduanya support
-- TypeScript declarations lengkap untuk semua tipe button/interactive
-- CJS wrapper diperbarui: 183 → 317 exports (DisconnectReason, Browsers, dan semua utils sekarang tersedia di CJS)
+- Ported `decryptEventEdit`, `decryptComment`, `decryptReaction` and their
+  automatic handlers in `processMessage`
+- Added `meLid = creds.me?.lid` in `processMessage`
+- Quoted messages: `quotedType = EXPLICIT` + `threadId VIEW_REPLIES` in
+  groups
+- Fixed dual shop API styles: both `{ shop: { surface, id } }` and
+  `{ shop: surface, id }` are now supported
+- Complete TypeScript declarations for every button/interactive type
+- CJS wrapper updated: 183 → 317 exports (`DisconnectReason`, `Browsers`,
+  and all utils are now available in CJS)
 
 ### v1.4.0
-- Fix `isJidNewsletter` error pada lazy-load `waUploadToServer`
-- Fix carousel crash `upload is not a function`
-- Fix `ptvMessage` return type
-- Tambah `normalizeMentionJid`, `resolveJid`, `resolveJids`
-- Tambah `getEphemeralGroup` dan auto ephemeral detect di sendMessage
-- Konversi `hiura-advanced.js` ke ESM proper
+- Fixed `isJidNewsletter` error on lazy-loaded `waUploadToServer`
+- Fixed carousel crash `upload is not a function`
+- Fixed `ptvMessage` return type
+- Added `normalizeMentionJid`, `resolveJid`, `resolveJids`
+- Added `getEphemeralGroup` and auto ephemeral detection in `sendMessage`
+- Converted `hiura-advanced.js` to proper ESM
 
 ### v1.2.1
-- Hiura Engine: handleInteractive, handleInteractiveButtons, handleAlbum, handlePayment, handleProduct, handleEvent, handleGroupStory
-- Rich messages: sendTable, sendTableV2, sendCodeBlock, sendCodeBlockV2, sendLatex, sendLatexImage, sendLink, sendLinkV2, sendRichMessage, sendUnifiedResponse, sendPreview
+- Hiura Engine: `handleInteractive`, `handleInteractiveButtons`,
+  `handleAlbum`, `handlePayment`, `handleProduct`, `handleEvent`,
+  `handleGroupStory`
+- Rich messages: `sendTable`, `sendTableV2`, `sendCodeBlock`,
+  `sendCodeBlockV2`, `sendLatex`, `sendLatexImage`, `sendLink`,
+  `sendLinkV2`, `sendRichMessage`, `sendUnifiedResponse`, `sendPreview`
 - Full source maps
 
 ### v1.0.0
-- Base dari blckrose-baileys
+- Base from blckrose-baileys
 - Full LID + JID support
-- Semua tipe interactive button (native flow)
+- Every interactive button type (native flow)
 - Pairing code, carousel, album
 - ESM + CJS dual support
 
 ---
 
-## Lisensi
+## License
 
-2026 Nimzz
-
-Proyek ini tidak berafiliasi dengan WhatsApp Inc. atau Meta Platforms.
+<p align="center">
+  MIT © 2026 Nimzz<br>
+  This project is not affiliated with WhatsApp Inc. or Meta Platforms.
+</p>

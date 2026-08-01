@@ -47,6 +47,7 @@ export declare class MessageRetryManager {
     private messageKeyIndex;
     private sessionRecreateHistory;
     private retryCounters;
+    private baseKeys;
     private pendingPhoneRequests;
     private readonly maxMsgRetryCount;
     private statistics;
@@ -104,6 +105,19 @@ export declare class MessageRetryManager {
      * Cancel pending phone request
      */
     cancelPendingPhoneRequest(messageId: string): void;
+    /**
+     * Resets all in-memory retry state. Call on logout/socket close.
+     */
+    clear(): void;
+    /**
+     * Remembers the base key seen for this (address, messageId) retry.
+     */
+    saveBaseKey(addr: string, msgId: string, baseKey: Uint8Array): void;
+    /**
+     * True when a previously-stored base key for this retry matches `baseKey`.
+     */
+    hasSameBaseKey(addr: string, msgId: string, baseKey: Uint8Array): boolean;
+    deleteBaseKey(addr: string, msgId: string): void;
     private keyToString;
     private removeRecentMessage;
 }

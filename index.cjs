@@ -1,119 +1,29 @@
 'use strict';
 
 /**
- * hiura-baileys — CJS entry point
- * By Nimzz · github.com/Nimzz-pemboy
- * Base: hiura-baileys 1.5.0 (cr: @Blckrose0)
+ * hiura-baileys — CJS entry shim (ESM-only as of this build)
  *
- * Cara pakai — sama seperti CJS biasa, tidak ada lagi await/ready:
+ * Why this changed: the previous version of this file used Node's
+ * synchronous require(esm) to bridge into lib/index.js at runtime. That
+ * only works on Node >=20.19.0 or >=22.12.0 — many hosting panels ship a
+ * "Node 22" that is still below 22.12, so `require('hiura-baileys')` would
+ * fail there with a confusing native ERR_REQUIRE_ESM error, even though the
+ * panel's own spec sheet says "Node 22+". Detecting and working around that
+ * per-patch-version gap added a lot of fragile logic for very little value.
  *
- *   const { makeWASocket, useMultiFileAuthState, proto, BufferJSON } = require('hiura-baileys');
+ * This package is published as ESM ("type": "module"). Please import it
+ * instead of requiring it:
  *
- *   async function start() {
- *     const { state, saveCreds } = await useMultiFileAuthState('./auth');
- *     const conn = makeWASocket({ auth: state });
- *   }
- *   start();
+ *   import { makeWASocket, useMultiFileAuthState } from 'hiura-baileys';
  *
- * ============================================================
- * KENAPA FILE INI DITULIS ULANG (v1.5.0 -> v1.5.1 internal fix)
- * ============================================================
- * Versi sebelumnya pakai dynamic import() + lazy getter: semua nilai
- * non-fungsi (proto, BufferJSON, DisconnectReason, dst) baru benar-benar
- * tersedia SETELAH _load() selesai, dan _load() baru jalan kalau ada
- * fungsi (mis. useMultiFileAuthState) yang sempat dipanggil dan di-await
- * duluan. Konsekuensinya: kode yang melakukan
- *
- *   const { proto, BufferJSON } = require('hiura-baileys');
- *
- * di baris paling atas file (sebelum ada `await` apapun) akan dapat
- * error "belum siap", karena destructuring itu mengevaluasi getter
- * SAAT ITU JUGA, secara sinkron — padahal _mod waktu itu masih null.
- *
- * Solusinya: lib/index.js (ESM) di package ini TIDAK punya top-level
- * await, sehingga sejak Node v20.19.0 / v22.12.0 (require(esm) sudah
- * stabil tanpa flag), kita bisa require() dia langsung secara SINKRON
- * dan dapat semua exports-nya seketika — persis seperti module CJS
- * biasa. Tidak perlu lagi dynamic import(), tidak perlu lagi lazy
- * getter, tidak perlu lagi await ready.
- *
- * SYARAT NODE: >= 20.19.0 atau >= 22.12.0. Kalau Node lebih lama dari
- * itu, require() di bawah akan throw ERR_REQUIRE_ESM dengan pesan asli
- * dari Node — pesan error di catch block bawah ini menjelaskan kenapa
- * dan apa yang perlu di-upgrade.
+ * If your project is CommonJS, either:
+ *   1) Use a dynamic import (works in any CJS file, any Node version):
+ *        const { makeWASocket } = await import('hiura-baileys');
+ *   2) Or switch your project to ESM ("type": "module" in your
+ *      package.json, or a .mjs entry file).
  */
-
-let _mod;
-try {
-  _mod = require('./lib/index.js');
-} catch (err) {
-  if (err && err.code === 'ERR_REQUIRE_ESM') {
-    const v = process.versions.node;
-    throw new Error(
-      `[hiura-baileys] Gagal require('./lib/index.js') karena Node.js Anda (v${v}) ` +
-      `belum mendukung require(esm) secara native.\n` +
-      `Package ini butuh Node.js >= 20.19.0 atau >= 22.12.0 (tanpa flag tambahan).\n` +
-      `Silakan upgrade Node.js Anda, lalu jalankan ulang.\n\n` +
-      `Error asli dari Node: ${err.message}`
-    );
-  }
-
-  if (err && err.code === 'ERR_REQUIRE_ASYNC_MODULE') {
-    // Ini berarti ADA file di dependency graph yang punya top-level
-    // await (bukan lib/index.js sendiri — itu sudah diverifikasi tidak
-    // punya — tapi salah satu paket yang di-import olehnya). Daripada
-    // user harus akses terminal manual untuk pakai flag
-    // --experimental-print-required-tla, kita jalankan diagnosis itu
-    // sendiri lewat child process, supaya nama file yang sebenarnya
-    // bermasalah otomatis tercetak di log startup biasa.
-    let diag = null;
-    try {
-      const { spawnSync } = require('child_process');
-      const result = spawnSync(
-        process.execPath,
-        ['--experimental-print-required-tla', '-e', `require(${JSON.stringify(require.resolve('./lib/index.js'))})`],
-        { encoding: 'utf8', timeout: 15000 }
-      );
-      diag = (result.stderr || result.stdout || '').trim();
-    } catch {
-      // Diagnosis otomatis gagal dijalankan (mis. spawnSync diblokir di
-      // environment ini) — tidak masalah, tetap lanjut ke pesan error
-      // di bawah dengan diag = null.
-    }
-
-    throw new Error(
-      `[hiura-baileys] require() gagal: ada file di dependency graph yang punya top-level await ` +
-      `(ERR_REQUIRE_ASYNC_MODULE). lib/index.js milik package ini sendiri SUDAH diverifikasi tidak ` +
-      `punya top-level await — kemungkinan besar salah satu dependency (mis. paket WASM/native binding) ` +
-      `yang jadi sumbernya.\n\n` +
-      `=== Diagnosis otomatis (--experimental-print-required-tla) ===\n${diag || '(diagnosis gagal dijalankan, lihat error asli di bawah)'}\n` +
-      `===============================================================\n\n` +
-      `Error asli dari Node: ${err.message}`
-    );
-  }
-
-  throw err;
-}
-
-// Re-export semua named exports + default secara langsung, sinkron.
-// Tidak ada lagi getter/proxy — ini object biasa, sama seperti hasil
-// require() module CJS pada umumnya.
-for (const key of Object.keys(_mod)) {
-  if (key === 'default') continue;
-  module.exports[key] = _mod[key];
-}
-
-// default export (makeWASocket) — exported juga sebagai named export
-// 'makeWASocket' untuk kompatibilitas dengan kode yang sudah destructure
-// `const { default: makeWASocket } = require('hiura-baileys')` (gaya lama)
-// MAUPUN `const { makeWASocket } = require('hiura-baileys')` (gaya baru).
-module.exports.default = _mod.default;
-if (!('makeWASocket' in module.exports)) {
-  module.exports.makeWASocket = _mod.default;
-}
-
-// Properti ini sengaja tetap disediakan (walau sekarang sudah tidak
-// dibutuhkan secara fungsional) supaya kode lama yang masih menulis
-// `await require('hiura-baileys').ready` tidak crash — sekarang cuma
-// Promise yang sudah resolved dari awal.
-module.exports.ready = Promise.resolve(_mod);
+throw new Error(
+    "[hiura-baileys] This package is ESM-only — `require('hiura-baileys')` is not supported.\n" +
+    "Use `import { makeWASocket } from 'hiura-baileys'` instead, or, from CommonJS code, " +
+    "`const { makeWASocket } = await import('hiura-baileys')`."
+);
