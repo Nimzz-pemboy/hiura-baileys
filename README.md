@@ -1,7 +1,7 @@
 <h1 align="center">hiura-baileys</h1>
 
 <p align="center">
-  <img src="REPLACE_WITH_YOUR_BANNER_IMAGE_URL" alt="hiura-baileys" width="100%" />
+  <img src="https://files.catbox.moe/wov30o.png" alt="hiura-baileys" width="100%" />
 </p>
 
 <p align="center">
