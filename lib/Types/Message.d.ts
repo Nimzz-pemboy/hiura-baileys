@@ -194,35 +194,6 @@ export type InteractiveButtonsContent = {
     footer?: string;
     media?: boolean;
 } & Mentionable & Contextable;
-export type ButtonLocationMessageContent = {
-    buttonLocation: {
-        latitude: number;
-        longitude: number;
-        name?: string;
-        address?: string;
-        /** URL, file path, or Buffer — resized to a small JPEG for the header */
-        jpegThumbnail?: string | Buffer;
-        thumbnail?: string | Buffer;
-        text?: string;
-        title?: string;
-        subtitle?: string;
-        footer?: string;
-        extraButtons?: (proto.Message.InteractiveMessage.NativeFlowMessage.INativeFlowButton | {
-            id?: string;
-            buttonId?: string;
-            displayText?: string;
-            text?: string;
-        })[];
-        listMenu?: {
-            id?: string;
-            header?: string;
-            title?: string;
-            description?: string;
-        }[];
-        listButtonText?: string;
-        listSectionTitle?: string;
-    };
-} & Mentionable & Contextable;
 export type ShopMessageContent = {
     /** Support both { shop: { surface, id } } and { shop: surface, id } */
     shop: proto.Message.InteractiveMessage.ShopMessage.Surface | {
@@ -300,7 +271,7 @@ export type AnyRegularMessageContent = (({
     businessOwnerJid?: string;
     body?: string;
     footer?: string;
-} | ButtonsMessageContent | TemplateButtonsContent | SectionsMessageContent | ProductListMessageContent | InteractiveButtonsContent | ButtonLocationMessageContent | ShopMessageContent | CollectionMessageContent | CardsMessageContent | SharePhoneNumber | RequestPhoneNumber) & ViewOnce;
+} | ButtonsMessageContent | TemplateButtonsContent | SectionsMessageContent | ProductListMessageContent | InteractiveButtonsContent | ShopMessageContent | CollectionMessageContent | CardsMessageContent | SharePhoneNumber | RequestPhoneNumber) & ViewOnce;
 export type AnyMessageContent = AnyRegularMessageContent | {
     forward: WAMessage;
     force?: boolean;
